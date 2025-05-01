@@ -13,6 +13,12 @@ ZHub is a modern and clean Roblox script hub created for **educational and fun s
 - ✅ No key system – plug and play
 - 🔌 Supports executors: Synapse X, KRNL, Fluxus, etc.
 
+## Installation
+Paste the following code into the console:
+  ```lua
+loadstring(game:HttpGet("https://raw.githubusercontent.com/ZHubTeam/zhubteam.github.io/main/zhub-script.lua"))()
+```
+
 ## 📚 Purpose
 
 This hub was developed to demonstrate:
