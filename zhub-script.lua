@@ -1,4 +1,3 @@
--- CROSS-PLATFORM EXECUTOR SCRIPT, FEATURES CAN BE UPDATED --
 if _G.ScriptHubLoaded then return end
 _G.ScriptHubLoaded = true
 
@@ -38,45 +37,72 @@ local gui = Instance.new("ScreenGui", CoreGui)
 gui.Name = "ZScriptHub"
 gui.ResetOnSpawn = false
 
+-- MAIN FRAME: With a shadow effect and rounded corners
 local main = Instance.new("Frame", gui)
-main.Size = UDim2.new(0, 450, 0, 300)
-main.Position = UDim2.new(0.5, -225, 0.5, -150)
-main.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+main.Size = UDim2.new(0, 500, 0, 350)
+main.Position = UDim2.new(0.5, -250, 0.5, -175)
+main.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 main.BorderSizePixel = 0
 main.Active = true
 main.Draggable = true
-Instance.new("UICorner", main).CornerRadius = UDim.new(0, 8)
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 12)
+main.ZIndex = 10
 
--- Top bar
+-- SHADOW EFFECT: To give it a floating look
+local shadow = Instance.new("ImageLabel", main)
+shadow.Size = UDim2.new(1, 20, 1, 20)
+shadow.Position = UDim2.new(0, -10, 0, -10)
+shadow.Image = "rbxassetid://13196426434"
+shadow.ImageTransparency = 0.6
+shadow.BackgroundTransparency = 1
+shadow.ZIndex = 1
+
+-- Top Bar: New font style and additional hover effects
 local topBar = Instance.new("TextLabel", main)
-topBar.Size = UDim2.new(1, 0, 0, 35)
-topBar.BackgroundTransparency = 1
-topBar.Text = "ZHub"
+topBar.Size = UDim2.new(1, 0, 0, 45)
+topBar.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
+topBar.Text = "ZHub - Script Hub"
 topBar.Font = Enum.Font.GothamBold
-topBar.TextSize = 16
+topBar.TextSize = 20
 topBar.TextColor3 = Color3.fromRGB(255, 255, 255)
+topBar.TextStrokeTransparency = 0.8
+topBar.TextXAlignment = Enum.TextXAlignment.Left
+topBar.TextYAlignment = Enum.TextYAlignment.Center
+topBar.TextButton.MouseEnter:Connect(function() 
+    topBar.TextColor3 = Color3.fromRGB(255, 0, 0)
+end)
+topBar.TextButton.MouseLeave:Connect(function()
+    topBar.TextColor3 = Color3.fromRGB(255, 255, 255)
+end)
 
--- Side tabs
+-- Side Tabs: A modern tab bar with rounded buttons
 local tabHolder = Instance.new("Frame", main)
-tabHolder.Size = UDim2.new(0, 120, 1, -35)
-tabHolder.Position = UDim2.new(0, 0, 0, 35)
-tabHolder.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-Instance.new("UICorner", tabHolder).CornerRadius = UDim.new(0, 6)
+tabHolder.Size = UDim2.new(0, 120, 1, -45)
+tabHolder.Position = UDim2.new(0, 0, 0, 45)
+tabHolder.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+tabHolder.BorderSizePixel = 0
+Instance.new("UICorner", tabHolder).CornerRadius = UDim.new(0, 8)
 
--- Function library for creating tabs
+-- Hover effect for buttons in tabs
 local function createTab(name, callback)
     local btn = Instance.new("TextButton", tabHolder)
-    btn.Size = UDim2.new(1, 0, 0, 40)
-    btn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    btn.Size = UDim2.new(1, 0, 0, 50)
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     btn.Text = name
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
     btn.Font = Enum.Font.Gotham
-    btn.TextSize = 14
+    btn.TextSize = 16
     btn.AutoButtonColor = false
-    btn.MouseEnter:Connect(function() btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60) end)
-    btn.MouseLeave:Connect(function() btn.BackgroundColor3 = Color3.fromRGB(45, 45, 45) end)
+    btn.TextButton.MouseEnter:Connect(function() 
+        btn.BackgroundColor3 = Color3.fromRGB(75, 75, 75) 
+    end)
+    btn.TextButton.MouseLeave:Connect(function()
+        btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    end)
     btn.MouseButton1Click:Connect(callback)
 end
+
+-- Create tabs with a modern design
 
 -- ESP SCRIPT FUNCTION
 local function runESP()
@@ -184,19 +210,7 @@ local function runTP()
     end)
 end
 
--- How to Install Tab
-createTab("How to Install", function()
-    local guide = Instance.new("TextLabel")
-    guide.Size = UDim2.new(0, 400, 0, 200)
-    guide.Position = UDim2.new(0.5, -200, 0.5, -100)
-    guide.Text = "1. Open your executor\n2. Copy-paste the script\n3. Enjoy ZHub!"
-    guide.TextSize = 16
-    guide.BackgroundTransparency = 1
-    guide.TextColor3 = Color3.fromRGB(255, 255, 255)
-    guide.Parent = gui
-end)
-
--- Create the Tabs
+-- Create the Tabs with modern UI
 createTab("ESP", function()
     runESP()
 end)
@@ -207,6 +221,17 @@ end)
 
 createTab("Teleport", function()
     runTP()
+end)
+
+createTab("How to Install", function()
+    local guide = Instance.new("TextLabel")
+    guide.Size = UDim2.new(0, 400, 0, 200)
+    guide.Position = UDim2.new(0.5, -200, 0.5, -100)
+    guide.Text = "1. Open your executor\n2. Copy-paste the script\n3. Enjoy ZHub!"
+    guide.TextSize = 16
+    guide.BackgroundTransparency = 1
+    guide.TextColor3 = Color3.fromRGB(255, 255, 255)
+    guide.Parent = gui
 end)
 
 -- Done
