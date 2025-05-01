@@ -24,7 +24,7 @@ progressBar.Position = UDim2.new(0.5, -225, 0.5, 180)
 progressBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
 progressBar.Parent = loading
 
--- Animate the progress bar
+-- Animate the progress bar smoothly
 for i = 1, 100 do
     wait(0.05)
     progressBar.Size = UDim2.new(i / 100, 0, 0, 5)
@@ -37,87 +37,79 @@ local gui = Instance.new("ScreenGui", CoreGui)
 gui.Name = "ZScriptHub"
 gui.ResetOnSpawn = false
 
--- MAIN FRAME: With a shadow effect and rounded corners
+-- MAIN FRAME: With smooth shadows and refined rounded corners
 local main = Instance.new("Frame", gui)
-main.Size = UDim2.new(0, 500, 0, 350)
-main.Position = UDim2.new(0.5, -250, 0.5, -175)
-main.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+main.Size = UDim2.new(0, 550, 0, 380)
+main.Position = UDim2.new(0.5, -275, 0.5, -190)
+main.BackgroundColor3 = Color3.fromRGB(28, 28, 28)  -- Dark theme
 main.BorderSizePixel = 0
 main.Active = true
 main.Draggable = true
 Instance.new("UICorner", main).CornerRadius = UDim.new(0, 12)
-main.ZIndex = 10
 
--- SHADOW EFFECT: To give it a floating look
+-- SHADOW EFFECT FOR MAIN FRAME
 local shadow = Instance.new("ImageLabel", main)
-shadow.Size = UDim2.new(1, 20, 1, 20)
-shadow.Position = UDim2.new(0, -10, 0, -10)
-shadow.Image = "rbxassetid://13196426434"
+shadow.Size = UDim2.new(1, 10, 1, 10)
+shadow.Position = UDim2.new(0, -5, 0, -5)
+shadow.Image = "rbxassetid://13196426434"  -- Subtle shadow texture
 shadow.ImageTransparency = 0.6
 shadow.BackgroundTransparency = 1
-shadow.ZIndex = 1
 
--- Top Bar: New font style and additional hover effects
+-- Top Bar: More subtle and sleek
 local topBar = Instance.new("TextLabel", main)
-topBar.Size = UDim2.new(1, 0, 0, 45)
-topBar.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
+topBar.Size = UDim2.new(1, 0, 0, 40)
+topBar.BackgroundColor3 = Color3.fromRGB(38, 38, 38)  -- Slightly darker for a nice contrast
 topBar.Text = "ZHub - Script Hub"
 topBar.Font = Enum.Font.GothamBold
-topBar.TextSize = 20
+topBar.TextSize = 18
 topBar.TextColor3 = Color3.fromRGB(255, 255, 255)
-topBar.TextStrokeTransparency = 0.8
+topBar.TextStrokeTransparency = 0.7
 topBar.TextXAlignment = Enum.TextXAlignment.Left
 topBar.TextYAlignment = Enum.TextYAlignment.Center
-topBar.TextButton.MouseEnter:Connect(function() 
-    topBar.TextColor3 = Color3.fromRGB(255, 0, 0)
-end)
-topBar.TextButton.MouseLeave:Connect(function()
-    topBar.TextColor3 = Color3.fromRGB(255, 255, 255)
-end)
 
--- Side Tabs: A modern tab bar with rounded buttons
+-- Side Tabs: Modern and clean
 local tabHolder = Instance.new("Frame", main)
-tabHolder.Size = UDim2.new(0, 120, 1, -45)
-tabHolder.Position = UDim2.new(0, 0, 0, 45)
-tabHolder.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+tabHolder.Size = UDim2.new(0, 140, 1, -40)
+tabHolder.Position = UDim2.new(0, 0, 0, 40)
+tabHolder.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
 tabHolder.BorderSizePixel = 0
-Instance.new("UICorner", tabHolder).CornerRadius = UDim.new(0, 8)
+Instance.new("UICorner", tabHolder).CornerRadius = UDim.new(0, 10)
 
--- Hover effect for buttons in tabs
+-- Tab buttons with hover effect
 local function createTab(name, callback)
     local btn = Instance.new("TextButton", tabHolder)
     btn.Size = UDim2.new(1, 0, 0, 50)
-    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)  -- Slightly lighter
     btn.Text = name
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
     btn.Font = Enum.Font.Gotham
     btn.TextSize = 16
     btn.AutoButtonColor = false
     btn.TextButton.MouseEnter:Connect(function() 
-        btn.BackgroundColor3 = Color3.fromRGB(75, 75, 75) 
+        btn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)  -- Highlight when hovered
     end)
     btn.TextButton.MouseLeave:Connect(function()
-        btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     end)
     btn.MouseButton1Click:Connect(callback)
 end
 
--- Create tabs with a modern design
-
 -- ESP SCRIPT FUNCTION
 local function runESP()
+    -- Iterate through all players to highlight them
     for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer and player.Character then
             if not player.Character:FindFirstChild("Highlight") then
                 local highlight = Instance.new("Highlight")
-                highlight.FillColor = Color3.fromRGB(255, 0, 0)
-                highlight.OutlineColor = Color3.fromRGB(255, 230, 255)
+                highlight.FillColor = Color3.fromRGB(255, 0, 0)  -- Red highlight
+                highlight.OutlineColor = Color3.fromRGB(255, 230, 255)  -- Soft pink outline
                 highlight.Adornee = player.Character
                 highlight.Parent = player.Character
             end
         end
     end
 
+    -- Add highlights to new players
     Players.PlayerAdded:Connect(function(player)
         player.CharacterAdded:Connect(function(char)
             wait(1)
@@ -137,6 +129,7 @@ local function runFly()
     local bv, bg, body
     local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 
+    -- Start flying function
     local function startFly()
         if flying then return end
         flying = true
@@ -152,6 +145,7 @@ local function runFly()
         bg.P = 10^5
         bg.Parent = hrp
 
+        -- Fly movement logic
         RunService.RenderStepped:Connect(function()
             if not flying then return end
             local cam = workspace.CurrentCamera
@@ -165,12 +159,14 @@ local function runFly()
         end)
     end
 
+    -- Stop flying function
     local function stopFly()
         flying = false
         if bv then bv:Destroy() end
         if bg then bg:Destroy() end
     end
 
+    -- Toggle fly mode with "E" key
     UserInputService.InputBegan:Connect(function(input)
         if input.KeyCode == Enum.KeyCode.E then
             if flying then stopFly() else startFly() end
@@ -178,39 +174,35 @@ local function runFly()
     end)
 end
 
--- TELEPORT SCRIPT FUNCTION (Realistic Logic)
+-- TELEPORT SCRIPT FUNCTION
 local function runTP()
-    -- Function to teleport to a specific location (example: Vector3(0, 10, 0))
+    -- Teleport to location (customizable)
     local function teleportToLocation(location)
         if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
             LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(location)
         end
     end
 
-    -- Function to teleport to a specific player
+    -- Teleport to another player
     local function teleportToPlayer(playerName)
         local targetPlayer = Players:FindFirstChild(playerName)
-        if targetPlayer and targetPlayer.Character then
-            local targetHRP = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
-            if targetHRP then
-                LocalPlayer.Character.HumanoidRootPart.CFrame = targetHRP.CFrame
-            end
+        if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
         end
     end
 
-    -- Button for teleporting to a predefined location (Example location)
-    createTab("TP to Location", function()
-        teleportToLocation(Vector3.new(0, 10, 0))  -- Customize this location
+    -- Create buttons for teleportation functionality
+    createTab("Teleport to Location", function()
+        teleportToLocation(Vector3.new(0, 10, 0))  -- Customize the location here
     end)
 
-    -- Button for teleporting to a specific player (User can input player's name)
-    createTab("TP to Player", function()
+    createTab("Teleport to Player", function()
         local playerName = "TargetPlayerName"  -- Replace this with the target player's name
         teleportToPlayer(playerName)
     end)
 end
 
--- Create the Tabs with modern UI
+-- CREATE TABS AND BIND FUNCTIONALITY
 createTab("ESP", function()
     runESP()
 end)
