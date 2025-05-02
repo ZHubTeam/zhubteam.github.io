@@ -1,151 +1,101 @@
+-- Prevent multiple executions
 if _G.ScriptHubLoaded then return end
 _G.ScriptHubLoaded = true
 
--- Services
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local CoreGui = game:GetService("CoreGui")
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
+-- Load Rayfield UI Library
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
 
--- LOADING SCREEN WITH PROGRESS BAR
-local loading = Instance.new("TextLabel")
-loading.Size = UDim2.new(1, 0, 1, 0)
-loading.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-loading.Text = "Loading ZHub..."
-loading.TextSize = 24
-loading.Font = Enum.Font.GothamBold
-loading.TextColor3 = Color3.fromRGB(255, 255, 255)
-loading.Parent = CoreGui
+-- Create the main window
+local Window = Rayfield:CreateWindow({
+    Name = "ZHub - Script Hub",
+    LoadingTitle = "ZHub",
+    LoadingSubtitle = "Initializing...",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "ZHubConfigs",
+        FileName = "ZHubSettings"
+    },
+    Discord = {
+        Enabled = false,
+        Invite = "", -- Add your Discord invite code here
+        RememberJoins = true
+    },
+    KeySystem = false,
+    KeySettings = {
+        Title = "ZHub Key System",
+        Subtitle = "Authentication Required",
+        Note = "Join our Discord to obtain the key.",
+        FileName = "ZHubKey",
+        SaveKey = true,
+        GrabKeyFromSite = false,
+        Key = {"YourKeyHere"} -- Replace with your actual key(s)
+    }
+})
 
-local progressBar = Instance.new("Frame")
-progressBar.Size = UDim2.new(0, 0, 0, 5)
-progressBar.Position = UDim2.new(0.5, -225, 0.5, 180)
-progressBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-progressBar.Parent = loading
+-- Create tabs
+local MainTab = Window:CreateTab("Main", 4483362458) -- Replace with your desired icon ID
+local TeleportTab = Window:CreateTab("Teleport", 4483362458)
+local InfoTab = Window:CreateTab("Info", 4483362458)
 
--- Animate the progress bar smoothly
-for i = 1, 100 do
-    wait(0.05)
-    progressBar.Size = UDim2.new(i / 100, 0, 0, 5)
-end
-wait(2)
-loading:Destroy()
-
--- MAIN GUI
-local gui = Instance.new("ScreenGui", CoreGui)
-gui.Name = "ZScriptHub"
-gui.ResetOnSpawn = false
-
--- MAIN FRAME: With smooth shadows and refined rounded corners
-local main = Instance.new("Frame", gui)
-main.Size = UDim2.new(0, 550, 0, 380)
-main.Position = UDim2.new(0.5, -275, 0.5, -190)
-main.BackgroundColor3 = Color3.fromRGB(28, 28, 28)  -- Dark theme
-main.BorderSizePixel = 0
-main.Active = true
-main.Draggable = true
-Instance.new("UICorner", main).CornerRadius = UDim.new(0, 12)
-
--- SHADOW EFFECT FOR MAIN FRAME
-local shadow = Instance.new("ImageLabel", main)
-shadow.Size = UDim2.new(1, 10, 1, 10)
-shadow.Position = UDim2.new(0, -5, 0, -5)
-shadow.Image = "rbxassetid://13196426434"  -- Subtle shadow texture
-shadow.ImageTransparency = 0.6
-shadow.BackgroundTransparency = 1
-
--- Top Bar: More subtle and sleek
-local topBar = Instance.new("TextLabel", main)
-topBar.Size = UDim2.new(1, 0, 0, 40)
-topBar.BackgroundColor3 = Color3.fromRGB(38, 38, 38)  -- Slightly darker for a nice contrast
-topBar.Text = "ZHub - Script Hub"
-topBar.Font = Enum.Font.GothamBold
-topBar.TextSize = 18
-topBar.TextColor3 = Color3.fromRGB(255, 255, 255)
-topBar.TextStrokeTransparency = 0.7
-topBar.TextXAlignment = Enum.TextXAlignment.Left
-topBar.TextYAlignment = Enum.TextYAlignment.Center
-
--- Side Tabs: Modern and clean
-local tabHolder = Instance.new("Frame", main)
-tabHolder.Size = UDim2.new(0, 140, 1, -40)
-tabHolder.Position = UDim2.new(0, 0, 0, 40)
-tabHolder.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-tabHolder.BorderSizePixel = 0
-Instance.new("UICorner", tabHolder).CornerRadius = UDim.new(0, 10)
-
--- Tab buttons with hover effect
-local function createTab(name, callback)
-    local btn = Instance.new("TextButton", tabHolder)
-    btn.Size = UDim2.new(1, 0, 0, 50)
-    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)  -- Slightly lighter
-    btn.Text = name
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.Font = Enum.Font.Gotham
-    btn.TextSize = 16
-    btn.AutoButtonColor = false
-    btn.TextButton.MouseEnter:Connect(function() 
-        btn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)  -- Highlight when hovered
-    end)
-    btn.TextButton.MouseLeave:Connect(function()
-        btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    end)
-    btn.MouseButton1Click:Connect(callback)
-end
-
--- ESP SCRIPT FUNCTION
+-- ESP Functionality
 local function runESP()
-    -- Iterate through all players to highlight them
-    for _, player in pairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer and player.Character then
-            if not player.Character:FindFirstChild("Highlight") then
-                local highlight = Instance.new("Highlight")
-                highlight.FillColor = Color3.fromRGB(255, 0, 0)  -- Red highlight
-                highlight.OutlineColor = Color3.fromRGB(255, 230, 255)  -- Soft pink outline
-                highlight.Adornee = player.Character
-                highlight.Parent = player.Character
-            end
-        end
-    end
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
 
-    -- Add highlights to new players
-    Players.PlayerAdded:Connect(function(player)
-        player.CharacterAdded:Connect(function(char)
-            wait(1)
+    local function highlightCharacter(character)
+        if not character:FindFirstChild("Highlight") then
             local highlight = Instance.new("Highlight")
             highlight.FillColor = Color3.fromRGB(255, 0, 0)
             highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-            highlight.Adornee = char
-            highlight.Parent = char
+            highlight.Adornee = character
+            highlight.Parent = character
+        end
+    end
+
+    -- Highlight existing players
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character then
+            highlightCharacter(player.Character)
+        end
+    end
+
+    -- Highlight new players
+    Players.PlayerAdded:Connect(function(player)
+        player.CharacterAdded:Connect(function(character)
+            wait(1)
+            highlightCharacter(character)
         end)
     end)
 end
 
--- FLY SCRIPT FUNCTION
+-- Fly Functionality
 local function runFly()
-    local FlySpeed = 50
-    local flying = false
-    local bv, bg, body
-    local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    local Players = game:GetService("Players")
+    local RunService = game:GetService("RunService")
+    local UserInputService = game:GetService("UserInputService")
+    local LocalPlayer = Players.LocalPlayer
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
 
-    -- Start flying function
+    local flying = false
+    local FlySpeed = 50
+    local bv, bg
+
     local function startFly()
         if flying then return end
         flying = true
-        hrp = LocalPlayer.Character:WaitForChild("HumanoidRootPart")
+
         bv = Instance.new("BodyVelocity")
         bv.Velocity = Vector3.new()
         bv.MaxForce = Vector3.new(1, 1, 1) * 1e9
-        bv.Parent = hrp
+        bv.Parent = HumanoidRootPart
 
         bg = Instance.new("BodyGyro")
-        bg.CFrame = hrp.CFrame
+        bg.CFrame = HumanoidRootPart.CFrame
         bg.MaxTorque = Vector3.new(1, 1, 1) * 1e9
         bg.P = 10^5
-        bg.Parent = hrp
+        bg.Parent = HumanoidRootPart
 
-        -- Fly movement logic
         RunService.RenderStepped:Connect(function()
             if not flying then return end
             local cam = workspace.CurrentCamera
@@ -154,12 +104,15 @@ local function runFly()
             if UserInputService:IsKeyDown(Enum.KeyCode.S) then dir = dir - cam.CFrame.LookVector end
             if UserInputService:IsKeyDown(Enum.KeyCode.A) then dir = dir - cam.CFrame.RightVector end
             if UserInputService:IsKeyDown(Enum.KeyCode.D) then dir = dir + cam.CFrame.RightVector end
-            bv.Velocity = dir.Unit * FlySpeed
+            if dir.Magnitude > 0 then
+                bv.Velocity = dir.Unit * FlySpeed
+            else
+                bv.Velocity = Vector3.zero
+            end
             bg.CFrame = cam.CFrame
         end)
     end
 
-    -- Stop flying function
     local function stopFly()
         flying = false
         if bv then bv:Destroy() end
@@ -167,64 +120,82 @@ local function runFly()
     end
 
     -- Toggle fly mode with "E" key
-    UserInputService.InputBegan:Connect(function(input)
+    UserInputService.InputBegan:Connect(function(input, gameProcessed)
+        if gameProcessed then return end
         if input.KeyCode == Enum.KeyCode.E then
-            if flying then stopFly() else startFly() end
+            if flying then
+                stopFly()
+            else
+                startFly()
+            end
         end
     end)
 end
 
--- TELEPORT SCRIPT FUNCTION
-local function runTP()
-    -- Teleport to location (customizable)
-    local function teleportToLocation(location)
-        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(location)
-        end
+-- Teleport Functionality
+local function teleportToLocation(location)
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(location)
     end
-
-    -- Teleport to another player
-    local function teleportToPlayer(playerName)
-        local targetPlayer = Players:FindFirstChild(playerName)
-        if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            LocalPlayer.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
-        end
-    end
-
-    -- Create buttons for teleportation functionality
-    createTab("Teleport to Location", function()
-        teleportToLocation(Vector3.new(0, 10, 0))  -- Customize the location here
-    end)
-
-    createTab("Teleport to Player", function()
-        local playerName = "TargetPlayerName"  -- Replace this with the target player's name
-        teleportToPlayer(playerName)
-    end)
 end
 
--- CREATE TABS AND BIND FUNCTIONALITY
-createTab("ESP", function()
-    runESP()
-end)
+local function teleportToPlayer(playerName)
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local targetPlayer = Players:FindFirstChild(playerName)
+    if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        LocalPlayer.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
+    end
+end
 
-createTab("Fly", function()
-    runFly()
-end)
+-- MainTab Buttons
+MainTab:CreateButton({
+    Name = "Enable ESP",
+    Callback = function()
+        runESP()
+    end,
+})
 
-createTab("Teleport", function()
-    runTP()
-end)
+MainTab:CreateButton({
+    Name = "Enable Fly (Toggle with 'E')",
+    Callback = function()
+        runFly()
+    end,
+})
 
-createTab("How to Install", function()
-    local guide = Instance.new("TextLabel")
-    guide.Size = UDim2.new(0, 400, 0, 200)
-    guide.Position = UDim2.new(0.5, -200, 0.5, -100)
-    guide.Text = "1. Open your executor\n2. Copy-paste the script\n3. Enjoy ZHub!"
-    guide.TextSize = 16
-    guide.BackgroundTransparency = 1
-    guide.TextColor3 = Color3.fromRGB(255, 255, 255)
-    guide.Parent = gui
-end)
+-- TeleportTab Inputs
+TeleportTab:CreateInput({
+    Name = "Teleport to Coordinates",
+    PlaceholderText = "Enter X, Y, Z",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(Text)
+        local x, y, z = Text:match("([^,]+),%s*([^,]+),%s*([^,]+)")
+        if x and y and z then
+            local position = Vector3.new(tonumber(x), tonumber(y), tonumber(z))
+            teleportToLocation(position)
+        else
+            Rayfield:Notify({
+                Title = "Invalid Input",
+                Content = "Please enter coordinates in the format: X, Y, Z",
+                Duration = 5,
+            })
+        end
+    end,
+})
 
--- Done
-print("✅ Script Hub loaded.")
+TeleportTab:CreateInput({
+    Name = "Teleport to Player",
+    PlaceholderText = "Enter Player Name",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(Text)
+        teleportToPlayer(Text)
+    end,
+})
+
+-- InfoTab Paragraph
+InfoTab:CreateParagraph({
+    Title = "How to Install",
+    Content = "1. Open your executor\n2. Copy-paste the script\n3. Enjoy ZHub!",
+})
