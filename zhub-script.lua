@@ -11,7 +11,7 @@ local Window = Rayfield:CreateWindow({
     LoadingTitle = "ZHub",
     LoadingSubtitle = "Initializing...",
     ConfigurationSaving = {
-        Enabled = true,
+        Enabled = false,
         FolderName = "ZHubConfigs",
         FileName = "ZHubSettings"
     },
@@ -33,9 +33,9 @@ local Window = Rayfield:CreateWindow({
 })
 
 -- Create tabs
-local MainTab = Window:CreateTab("Main", 4483362458) -- Replace with your desired icon ID
-local TeleportTab = Window:CreateTab("Teleport", 4483362458)
-local InfoTab = Window:CreateTab("Info", 4483362458)
+local MainTab = Window:CreateTab("Main") -- Replace with your desired icon ID
+local TeleportTab = Window:CreateTab("Teleport")
+local InfoTab = Window:CreateTab("Info")
 
 -- ESP Functionality
 local function runESP()
